@@ -1,0 +1,27 @@
+S -> NP VP 0.8
+S -> S0 VP 0.1
+S -> Verb NP 0.05
+S -> VP PP 0.03
+S -> 'Book' 0.01
+S -> 'Include' 0.004
+S -> 'Prefer' 0.006
+S0 -> Aux NP 0.1
+NP -> Det Nominal 0.6
+NP -> 'I' 0.1
+NP -> 'He' 0.02
+NP -> 'She' 0.02
+NP -> 'Me' 0.06
+NP -> 'Houston' 0.16
+NP -> 'NWA' 0.04
+Nominal -> Nominal Noun 0.2
+Nominal -> Nominal PP 0.5
+Nominal -> 'Book' 0.03
+Nominal -> 'Flight' 0.15
+Nominal -> 'Meal' 0.06
+Nominal -> 'Money' 0.06
+VP -> Verb NP 0.5
+VP -> VP PP 0.3
+VP -> 'Book' 0.1
+VP -> 'Include' 0.04
+VP -> 'Prefer' 0.06
+PP -> Prep NP 1.0
