@@ -1,4 +1,5 @@
 import argparse
+import random
 
 
 class Node:
@@ -25,60 +26,124 @@ class Node:
         '''
         return self.parent
 
+class GrammarGenerator:
+    def __init__(self, rules, lexicon):
+        '''
+        Arguments:
+            rules: a list of rules in the grammar
+            lexicon: a dictionary of words and their corresponding POS tags
+        '''
+        self.rules = rules
+        self.lexicon = lexicon
+        self.readRules(rules)
+        self.readLexicon(lexicon)
+
+    def readRules(self, ruleFile):
+        '''
+        Read the rules from a file and store them in a list.
+        :param ruleFile: the name of the file containing the rules
+        :return: a list of rules
+        '''
+        with open(ruleFile, 'r') as f:
+            lines = f.readlines()
+            self.rules = self.grammar = [x.replace("->", "").split() for x in lines]
+
+    def readLexicon(self, lexiconFile):
+        '''
+        Read the lexicon from a file and store them in a dictionary.
+        :param lexiconFile: the name of the file containing the lexicon
+        :return: a dictionary of words and their corresponding POS tags
+        '''
+        with open(lexiconFile, 'r') as f:
+            lines = f.readlines()
+            self.lexicon = {x.split(' -> ')[0]: x.split(' -> ')[1].replace('\n','').split(' | ') for x in lines}
+
+    def getPositions(self, terminals):
+        '''
+        Get a random list of terminal indexes from the list of terminals.
+        the list must be at least of lenght 1 and must have non repeating indexes.
+        :param terminals: a list of terminals
+        :return: a list of indexes
+        '''
+        positions = []
+        while len(positions) == 0:
+            positions = random.sample(range(len(terminals)), random.randint(0, len(terminals) - 1))
+        return positions
+
+    def getProbabilities(self, length):
+        '''
+        Given a length, generate a list of length propabilities in range 0 to 1 ramdomly distributed that sum 1.
+        :param length: the length of the list
+        :return: a list of probabilities
+        '''
+        probabilities = []
+        for i in range(length):
+            probabilities.append(random.random())
+
+        probabilities = [round(x / sum(probabilities), 2) for x in probabilities]
+        return probabilities
+
+
+    def generate(self):
+        '''
+        Generate a grammar from the rules and lexicon.
+        
+        :return: a matrix of rules for the whole grammar
+        '''
+        grammar = []
+        grammar.extend(self.rules)
+
+        for nonTerminal, terminals in self.lexicon.items():
+            positions = self.getPositions(terminals)
+            probabilities = self.getProbabilities(len(positions))
+
+            for i in range(len(positions)):
+                grammar.append([nonTerminal, f'{terminals[positions[i]]}', str(probabilities[i])])
+
+        return grammar
+
+    def writeGrammar(self, grammar, outputFile):
+        '''
+        Write the grammar to a file.
+        :param grammar: the grammar to be written
+        :param outputFile: the name of the file to write the grammar to
+        :return: None
+        '''
+        with open(outputFile, 'w') as f:
+            for rule in grammar:
+                f.write('{} -> {}\n'.format(rule[0], " ".join(rule[1:])))
 
 class Parser:
     '''
     Used to generate the parse tree of a given sentence with a given grammar
     '''
 
-    def __init__(self, grammar, sentence, write, draw):
+    def __init__(self, grammar, write, draw):
         '''
         Arguments:
             grammar: the grammar file that define the production rules
             sentence: the sentence to parse with the given grammar
+            write: a boolean value indicating whether to write the parse trees to a file
+            draw: a boolean value indicating whether to draw the parse tree
         '''
         self.parse_table = None
-        self.grammar = None
+        self.grammar = grammar
         self.write = write
         self.draw = draw
-        self.read_grammar(grammar)
-        self.load_sentence(sentence)
+        print("Grammar: {}".format(grammar))
 
-    def load_sentence(self, sentence):
-        '''
-        Used to load the sentence to parse from a file.
-
-        Arguments:
-            sentence: the file name containing the sentence to parse.
-        '''
-        with open(sentence) as fr1:
-            self.input = fr1.readline().split()
-
-    def read_grammar(self, grammar):
-        '''
-        Used to read the grammar from a file.
-
-        Arguments:
-            grammar: the file name containing the grammar.
-        '''
-        with open(grammar) as fr2:
-            lines = fr2.readlines()
-            self.grammar = [x.replace("->", "").split() for x in lines]
-
-    def parse(self):
+    def parse(self, sentence):
         '''
         Used to parse the sentence with the given grammar using the CKY algorithm.
-
-
         '''
-        length = len(self.input)
+        length = len(sentence)
         # self.parse_table[i][j] is the list of nodes in the i+1 cell of j+1 column in the table.
         # we work with the upper-triangular portion of the parse_table
         # In the CKY algorithm, we fill the table a column at a time working from left to right,
         # with each column filled from bottom to top
         self.parse_table = [[[] for i in range(length)] for j in range(length)]
 
-        for j, word in enumerate(self.input):
+        for j, word in enumerate(sentence):
             # go through every column, from left to right
             for rule in self.grammar:
                 # fill the terminal word cell
@@ -161,18 +226,47 @@ def poss_tree(node):
     return float(node.possibility) * poss_tree(node.child1) * poss_tree(
         node.child2)
 
+def load_sentence(sentence):
+        '''
+        Used to load the sentence to parse from a file.
+
+        Arguments:
+            sentence: the file name containing the sentence to parse.
+        '''
+        with open(sentence) as fr1:
+            input = fr1.readlines()
+            result = []
+
+            for line in input:
+                result.append(line.split())
+
+            return result
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("grammar")
+    parser.add_argument("rules")
+    parser.add_argument("lexicon")
     parser.add_argument("sentence")
+    parser.add_argument('--grammars', type=int, default=3)
     parser.add_argument('--no_write', dest='write', action='store_false')
     parser.add_argument('--no_draw', dest='draw', action='store_false')
     parser.set_defaults(write=True, draw=True)
     args = parser.parse_args()
-    CKY = Parser(args.grammar, args.sentence, args.write, args.draw)
-    CKY.parse()
-    CKY.print_tree()
+
+    grammar = GrammarGenerator(args.rules, args.lexicon)
+    grammars = []
+
+    for i in range(args.grammars):
+        grammars.append(grammar.generate())
+        grammar.writeGrammar(grammars[i], f'grammar-{i}.txt')
+
+    for i in range(args.grammars):
+        CKY = Parser(grammars[i], args.write, args.draw)
+
+        sentences = load_sentence(args.sentence)
+        for sentence in sentences:
+            CKY.parse(sentence)
+            CKY.print_tree()
 
 
 if __name__ == '__main__':

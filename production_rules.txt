@@ -1,0 +1,18 @@
+S -> NP VP 0.9
+S -> NP 0.1
+NP -> Pronoun 0.05
+NP -> Det Noun 0.3
+NP -> Non-Det Noun 0.1
+NP -> Name 0.2
+NP -> NP PP 0.1
+NP -> RelClause 0.05
+NP -> Det Adjs Noun 0.2
+VP -> Verb 0.3
+VP -> NP VP 0.2
+VP -> VP Adjective 0.25
+VP -> VP Adverb 0.1
+VP -> VP PP 0.15
+Adjs -> Adjective 0.5
+Adjs -> Adjective Adjs 0.5
+PP -> Preposition NP 1
+RelClause -> RelPro VP 1
