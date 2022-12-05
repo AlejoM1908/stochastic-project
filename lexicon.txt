@@ -2,11 +2,11 @@ Verb -> book | run | eat | catch | sleep | see | paint
 Det -> the | my | this | some | each
 Non-Det -> a | an
 Noun -> flight | robot | sheep | fence | paint
-Name -> Houston | John | Bob | Alice
-Pronoun -> me | she | they | he | we
+Adverb -> now | fast
+Conjunction -> and | or
 Preposition -> through | to | in | at
-Adjective -> good | new | sad | easy
-Adverb -> here | lightly | now
-Conjuction -> and | or | but
-Digit -> 0 | 1 | 2
-RelPro -> that | who | which
+Nominal -> Houston | Orlando | John | Bob | Alice
+VP -> book | run | eat | catch | sleep | see | paint
+Nominal -> flight | robot | sheep | fence | paint
+NP -> flight | Houston | Orlando | John | Bob | Alice | she | he
+S -> book | run | eat | catch | sleep | see | paint

@@ -1,0 +1,31 @@
+S -> NP VP 0.8
+S -> S1 S 0.9
+S1 -> S Conjunction 0.9
+S -> S0 VP 0.4
+S0 -> Aux NP 1.0
+NP -> Det Nominal 0.10
+NP -> Det Noun 0.8
+NP -> Non-Det Nominal 0.75
+NP -> Non-Det Noun 0.75
+Nominal -> Nominal Noun 0.90
+Nominal -> Nominal PP 0.95
+VP -> Verb NP 0.20
+VP -> VP1 PP 0.10
+VP1 -> Verb NP 1.0
+VP -> Verb PP 0.15
+VP -> VP PP 0.15
+VP -> VP2 NP 0.05
+VP -> Verb 0.9
+VP2 -> Verb NP 1.0
+VP -> VP Adverb 0.9
+PP -> Preposition NP 1.0
+NP -> Noun 0.75
+NP -> Nominal 0.75
+NP -> Nominal Noun 0.20
+NP -> Nominal PP 0.85
+S -> Verb NP 0.20
+S -> VP1 PP 0.50
+S -> Verb 0.55
+S -> Verb PP 0.15
+S -> VP PP 0.15
+S -> VP2 NP 0.75

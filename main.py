@@ -98,7 +98,7 @@ class GrammarGenerator:
             probabilities = self.getProbabilities(len(positions))
 
             for i in range(len(positions)):
-                grammar.append([nonTerminal, f'{terminals[positions[i]]}', str(probabilities[i])])
+                grammar.append([nonTerminal, f"'{terminals[positions[i]]}'", str(probabilities[i])])
 
         return grammar
 
@@ -130,7 +130,6 @@ class Parser:
         self.grammar = grammar
         self.write = write
         self.draw = draw
-        print("Grammar: {}".format(grammar))
 
     def parse(self, sentence):
         '''
@@ -169,7 +168,7 @@ class Parser:
                                 for child2 in child2_node
                             ])
 
-    def print_tree(self):
+    def print_tree(self, grammarId):
         '''
         Print and visualize the parse tree starting with the start parent.
         '''
@@ -183,8 +182,8 @@ class Parser:
         if final_nodes:
             # write all the possible results to a file
             if self.write:
-                with open("output.txt", "w") as fw:
-                    fw.write('Los posible resultados son:\n\n')
+                with open("output.txt", "a") as fw:
+                    fw.write(f'Los posible resultados de la gramatica {grammarId} son:\n\n')
                     write_trees = [generate_tree(node) for node in final_nodes]
                     poss_trees = [round(poss_tree(node),4) for node in final_nodes]
                     idx = poss_trees.index(max(poss_trees))
@@ -198,10 +197,6 @@ class Parser:
                 poss_trees = [poss_tree(node) for node in final_nodes]
                 idx = poss_trees.index(max(poss_trees))
                 print(generate_tree(final_nodes[idx]))
-        else:
-            print(
-                "Sorry! The given sentence is not contained in the language produced by the given grammar"
-            )
 
 
 def generate_tree(node, level=0):
@@ -258,7 +253,7 @@ def main():
 
     for i in range(args.grammars):
         grammars.append(grammar.generate())
-        grammar.writeGrammar(grammars[i], f'grammar-{i}.txt')
+        grammar.writeGrammar(grammars[i], f'grammars/grammar-{i}.txt')
 
     for i in range(args.grammars):
         CKY = Parser(grammars[i], args.write, args.draw)
@@ -266,7 +261,7 @@ def main():
         sentences = load_sentence(args.sentence)
         for sentence in sentences:
             CKY.parse(sentence)
-            CKY.print_tree()
+            CKY.print_tree(i)
 
 
 if __name__ == '__main__':
